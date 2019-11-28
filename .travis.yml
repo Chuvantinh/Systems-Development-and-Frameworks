@@ -13,6 +13,8 @@ install:
 script:
   - cd 2
   - npm test
+  - cd ../3
+  - npm test
 
 notifications:
   email:
