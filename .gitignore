@@ -1,0 +1,6 @@
+.idea/*
+/1/node_modules/*
+/2/node_modules/*
+/3/backend/node_modules/*
+/4/node_modules/*
+gitgnore
