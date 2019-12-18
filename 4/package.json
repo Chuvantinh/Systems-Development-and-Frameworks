@@ -4,7 +4,7 @@
   "description": "Test-drive the development of a GraphQL server.",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --detectOpenHandles --forceExit"
   },
   "keywords": [],
   "author": "",

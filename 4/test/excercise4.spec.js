@@ -58,6 +58,9 @@ describe('Creation of assignees and todo items', () => {
 const queryTodos = gql`query todos {todos { id, message, state }}`;
 const queryTodoByID = gql`query todo($id: ID!) { todo(id: $id) { id, message, state }}`;
 const queryTodosOrdered = gql`query todosOrderedByState($sortOrder: Order!) { todosOrderedByState(sortOrder: $sortOrder) { id, message, state }}`;
+const querySkipAndLimit = gql`query skipAndLimitTodos($skip: Int, $limit: Int) { skipAndLimitTodos(skip: $skip, limit: $limit) { id, message, state }}`;
+
+const mutateSetTodoState = gql`mutation setTodoState($id: ID!, $state: State!) { setTodoState(id: $id, state: $state) {id, message, state }}`;
 
 describe('Query assignees and todo items', () => {
 
@@ -103,6 +106,18 @@ describe('Query assignees and todo items', () => {
     it('Order todo by state DESC', async () => {
         await query({query: queryTodosOrdered, variables: {sortOrder: 'DESC'}}).then((result) => {
             expect(result.data.todosOrderedByState[0].state).toBe('UNDONE');
+        });
+    })
+
+    it('Set todo state', async () => {
+        await mutate({mutation: mutateSetTodoState, variables: { id: '1', state: 'DONE' }}).then((result) => {
+            expect(result.data.setTodoState).toMatchObject({id: '1', state: 'DONE'});
+        });
+    })
+
+    it('Skip and limit todos', async () => {
+        await mutate({mutation: querySkipAndLimit, variables: { skip: 1, limit: 2}}).then((result) => {
+            expect(result.data.skipAndLimitTodos.length).toBe(2);
         });
     })
 })

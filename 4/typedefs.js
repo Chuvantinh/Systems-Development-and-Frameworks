@@ -29,6 +29,7 @@ const typeDefs = `
     todos: [Todo]
     todo(id: ID!): Todo
     todosOrderedByState(sortOrder: Order!): [Todo]
+    skipAndLimitTodos(skip: Int, limit: Int): [Todo]
   }
 
   type Mutation {
@@ -38,6 +39,7 @@ const typeDefs = `
     deleteTodo(id: ID!): Todo
     deleteAllTodos: Boolean
     deleteAllAssignees: Boolean
+    setTodoState(id: ID!, state: State!): Todo
   }
 
 `;
@@ -89,6 +91,24 @@ const resolvers = {
         session.close();
       }
     },
+    skipAndLimitTodos: async (object, args, context) => {
+      const session = context.driver.session();
+      const skip = args.skip || 0;
+      const limit = args.limit || 0;
+
+      try {
+        const cypherQuery = 'MATCH (t:Todo) RETURN t ORDER BY t.id SKIP $skip LIMIT $limit';
+
+        const result = await session.run(cypherQuery, {
+          skip: skip,
+          limit: limit
+        });
+        const todos = result.records.map(record => record.get('t').properties);
+        return todos;
+      } finally {
+        session.close();
+      }
+    }
   },
   Mutation: {
     createTodo: async (object, args, context, resolveInfo) => {
@@ -169,6 +189,20 @@ const resolvers = {
       try {
         const cypherDelete = 'MATCH (a:Assignee) DETACH DELETE a';
         await session.run(cypherDelete);
+      } finally {
+        session.close();
+      }
+    },
+    setTodoState: async (object, args, context, resolveInfo) => {
+      const session = context.driver.session();
+      try {
+        const cypherMerge = 'MERGE (t:Todo {id: $id}) ON MATCH SET t.state = $state RETURN t';
+        const result = await session.run(cypherMerge, {
+          id: args.id,
+          state: args.state
+        });
+        const todo = result.records.map(record => record.get('t').properties)[0];
+        return todo;
       } finally {
         session.close();
       }
