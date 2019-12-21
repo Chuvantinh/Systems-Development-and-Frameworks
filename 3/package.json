@@ -1,0 +1,19 @@
+{
+  "name": "3",
+  "version": "1.0.0",
+  "description": "Test-drive the development of a GraphQL server.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.9.12",
+    "apollo-server-testing": "^2.9.12",
+    "graphql": "^14.5.8",
+    "jest": "^24.9.0",
+    "jsonwebtoken": "^8.5.1"
+  }
+}
