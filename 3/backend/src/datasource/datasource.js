@@ -2,18 +2,15 @@
 const assignees = [
     {
         id: '1',
-        name: 'Tinh',
-        role:'admin'
+        name: 'Tinh'
     },
     {
         id: '2',
-        name: 'Arnauld',
-        role:'custommer'
+        name: 'Arnauld'
     },
     {
         id: '3',
         name: 'Micha',
-        role:'editor'
     },
 ];
 
@@ -55,6 +52,9 @@ const todos = [
         assigneeId: '3',
     },
 ];
+
+
+
 
 module.exports.assignees = assignees;
 module.exports.todos = todos;

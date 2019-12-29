@@ -22,31 +22,14 @@ const typeDefs = `
     token: String
   }
   
-  type Product{
-    id: ID!
-    cat_id: Category
-    title: String!
-    matchcode : String
-    barcode: Int
-    unit: String
-    price: Float
-    color: String
-    image : String
-  }
-  
-  type Category{
-    id: ID!
-    title: String!
-  }
-  
   type Role{
       type: String
       role: String
   }
   
   type Query {
-    getTodoByAssigneeName(assignee: String!): Todos
-    getAssigneeByAssigneeIDwithShield(assignee: String!): Assignee
+    getAssigneeByTodo(assignee: String!): Assignee
+    getTodobyID(id: String!): Todos
   }
   
   type Mutation {

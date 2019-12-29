@@ -23,6 +23,7 @@ const resolvers = {
     },
     Mutation: {
         createTodo: (parent, args) => {
+
             if(args.id != null) {
                 if(todos.some(obj => obj.id === args.id)) {
                     return null;

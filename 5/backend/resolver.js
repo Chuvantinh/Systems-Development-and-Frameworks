@@ -3,29 +3,28 @@ const uuid = require('uuid/v1');
 
 const resolvers = {
     Query: {
-        getTodoByAssigneeName : async (object, args, context) => {
+        getAssigneeByTodo : async (object, args, context) => {
             const session = context.driver.session();
 
             try{
-                const cypherQuery = 'MATCH (t:Todos)--(a:Assignee) ' +
-                    'where a.name = $name ' +
-                    'RETURN t';
-                const result = await session.run(cypherQuery, { name: args.name });
-                const todo = result.records.map(record => record.get('t').properties)[0];
-                return todo;
+                const cypherQuery = 'MATCH (t:Todos { assignee: $assignee })-->(a:Assignee) ' +
+                    'RETURN a';
+                const result = await session.run(cypherQuery, { assignee: args.assignee });
+                const data = result.records.map(record => record.get('a').properties)[0];
+                return data;
             } finally {
                 session.close();
             }
         },
-        getAssigneeByAssigneeIDwithShield: async (object, args, context) => {
+        getTodobyID: async (object, args, context) => {
             const session = context.driver.session();
 
             try{
-                const cypherQuery = 'MATCH (t:Todos)--(a:Assignee) ' +
-                    'where t.assignee = $assignee ' +
-                    'RETURN a';
-                const result = await session.run(cypherQuery, { assignee: args.assignee });
-                const todo = result.records.map(record => record.get('a').properties)[0];
+                const cypherQuery = 'MATCH (t:Todos)' +
+                    'where t.id = $id ' +
+                    'RETURN t';
+                const result = await session.run(cypherQuery, { id: args.id });
+                const todo = result.records.map(record => record.get('t').properties)[0];
                 return todo;
             } finally {
                 session.close();

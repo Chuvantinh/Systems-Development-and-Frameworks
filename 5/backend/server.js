@@ -15,7 +15,7 @@ const schema = applyMiddleware(
         typeDefs,
         resolvers,
     }),
-    permissions,
+    //permissions,
 )
 
 const driver = neo4j.driver(
@@ -24,7 +24,6 @@ const driver = neo4j.driver(
 );
 
 const context = async ({ req }) => {
-   // const user = req.headers.authorization? req.headers.authorization : "Tinh2";
     const user = await decode.decode(driver, req)
     return {
         driver,
