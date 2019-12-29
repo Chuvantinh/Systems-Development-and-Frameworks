@@ -1,8 +1,8 @@
 const { jwt } = require('jsonwebtoken');
 
 const decode = async (driver, req) => {
-    console.log(req.headers.authorization);
-    let token = req.headers.authorization
+    console.log(req);
+
     try {
         //name is {name;vantinh}, security is angichua
         let decoded = await jwt.verify(token, 'angichua')

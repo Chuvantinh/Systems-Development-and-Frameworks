@@ -17,7 +17,7 @@ const isAdmin = rule({cache: 'contextual'})(
 
 const permissions = shield({
     Query: {
-        getTodobyID: isAdmin
+        getTodobyID: true
     },
 })
 

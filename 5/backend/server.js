@@ -8,14 +8,14 @@ const { makeAugmentedSchema } = require('neo4j-graphql-js')
 
 const permissions = require('./shield')
 
-const decode = require('./decode')
+//const decode = require('./decode')
 
 const schema = applyMiddleware(
     makeAugmentedSchema({
         typeDefs,
         resolvers,
     }),
-    //permissions,
+    permissions,
 )
 
 const driver = neo4j.driver(
@@ -23,19 +23,35 @@ const driver = neo4j.driver(
     neo4j.auth.basic('neo4j', '1234')
 );
 
-const context = async ({ req }) => {
-    const user = await decode.decode(driver, req)
-    return {
-        driver,
-        user,
-        req,
+
+const decode = async (driver, req) => {
+    console.log(req.headers.authorization);
+
+    try {
+        //name is {name;vantinh}, security is angichua
+        let decoded = await jwt.verify(req.headers.authorization, 'angichua')
+        if(decoded.name = "vantinh"){
+            const session = driver.session()
+            const cypherQuery = 'MATCH (a:Assignee) ' +
+                'where a.token = $token ' +
+                'RETURN a';
+            const result = await session.run(cypherQuery, { token: token});
+            const data = result.records.map(record => record.get('a').properties)[0];
+
+            return {
+                data
+            }
+        }
+    } catch (err) {
+        return null
     }
 }
 
 module.exports = new ApolloServer({
     schema,
-    context,
-    cors: {
-        origin: '*',
-        methods: 'GET,HEAD,POST',
-    },})
+    context: async ({ req }) => ({
+        driver,
+        req,
+        user: await decode(driver, req),
+    }),
+})
