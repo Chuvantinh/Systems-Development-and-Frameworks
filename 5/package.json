@@ -1,5 +1,5 @@
 {
-  "name": "5",
+  "name": "5-main",
   "version": "1.0.0",
   "description": "exercise 5",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Chuvantinh/Systems-Development-and-Frameworks.git"
+    "url": "https://github.com/Chuvantinh/Systems-Development-and-Frameworks.git"
   },
   "keywords": [
     "grapql",
@@ -21,14 +21,6 @@
   },
   "homepage": "https://github.com/Chuvantinh/Systems-Development-and-Frameworks#readme",
   "dependencies": {
-    "apollo-server": "^2.9.14",
-    "apollo-server-testing": "^2.9.14",
-    "graphql": "^14.5.8",
-    "graphql-middleware": "^4.0.2",
-    "graphql-shield": "^7.0.6",
-    "jest": "^24.9.0",
-    "jsonwebtoken": "^8.5.1",
-    "neo4j-graphql-js": "^2.11.0",
-    "yarn": "^1.21.1"
+    "vue-cli": "^2.9.6"
   }
 }

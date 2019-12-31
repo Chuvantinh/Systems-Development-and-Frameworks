@@ -27,9 +27,14 @@ const typeDefs = `
       role: String
   }
   
+  type Hello{
+        message: String
+  }
+  
   type Query {
     getAssigneeByTodo(assignee: String!): Assignee
     getTodobyID(id: String!): Todos
+    hello: Hello
   }
   
   type Mutation {

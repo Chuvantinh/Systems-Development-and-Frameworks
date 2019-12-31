@@ -15,7 +15,7 @@ const schema = applyMiddleware(
         typeDefs,
         resolvers,
     }),
-    permissions,
+    //permissions,
 )
 
 const driver = neo4j.driver(
@@ -25,7 +25,7 @@ const driver = neo4j.driver(
 
 
 const decode = async (driver, req) => {
-    console.log(req.headers.authorization);
+    console.log(req.get.authorization);
 
     try {
         //name is {name;vantinh}, security is angichua
@@ -48,10 +48,11 @@ const decode = async (driver, req) => {
 }
 
 module.exports = new ApolloServer({
-    schema,
-    context: async ({ req }) => ({
-        driver,
-        req,
-        user: await decode(driver, req),
-    }),
+    schema: schema,
+    context: async ({ req }) => {
+        const user = await decode(driver, req);
+        return {
+            driver, req, user
+        }
+    },
 })

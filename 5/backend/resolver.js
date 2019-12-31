@@ -3,6 +3,11 @@ const uuid = require('uuid/v1');
 
 const resolvers = {
     Query: {
+        hello : (object, args, context) => {
+            return {
+                message: "Hello word"
+            };
+        },
         getAssigneeByTodo : async (object, args, context) => {
             const session = context.driver.session();
 
