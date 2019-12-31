@@ -1,7 +1,7 @@
 <template v-if="todos">
     <div id="app">
         <img src="./assets/logo.png">
-        <List v-bind:todos="todos" v-on:remove="remove" v-on:save="save"/>
+        <List v-bind:todos="todos" v-on:remove="remove" v-on:save-list="savelist"/>
         <button v-on:click="add">Add new todo</button>
     </div>
 </template>
@@ -17,30 +17,30 @@
         data () {
             return {
                 todos: [
-                    {id: '0', message: 'Foo',},
-                    {id: '1', message: 'Bar',},
-                    {id: '2', message: 'Pub',}
-                ]
+                    {id: '1', message: 'Foo',},
+                    {id: '2', message: 'Bar',},
+                    {id: '3', message: 'Pub',}
+                ],
+                cId: 3
             }
         },
         methods: {
-            add:  () => {
-                this.todos.push({id: this.getId(), message: ''});
+            add: function () {
+                this.todos.push({id: this.getId(), message: ""});
+                this.cId++;
             },
-            save: function (index, input) {
+            savelist: function (index, input) {
                 this.todos[index].message = input;
             },
-            remove: (id) => {
+            remove: function (id) {
                 this.todos.splice(id, 1);
             },
-            getId:  () => {
-                return this.cId++;
+            getId: function () {
+                return this.cId + 1;
             }
         },
-        created: () => {
-            if (this.cId === -1) {
-                this.cId = this.todos.length + 1;
-            }
+        created: function () {
+                this.cId = this.todos.length;
         }
     }
 </script>

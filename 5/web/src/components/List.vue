@@ -22,7 +22,7 @@
         props:['todos'],
         methods: {
             save : function(id, input) {
-                this.$emit('edit', id, input);
+                this.$emit('save-list', id, input);
             },
             remove : function(id) {
                 this.$emit('remove', id)
