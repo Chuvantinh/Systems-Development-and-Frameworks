@@ -30,10 +30,17 @@
                 this.cId++;
             },
             savelist: function (index, input) {
-                this.todos[index].message = input;
+                console.log(input)
+                if(input != undefined){
+                    this.todos[index].message = input;
+                }
             },
             remove: function (id) {
-                this.todos.splice(id, 1);
+                this.todos.forEach((currentElement, index_inside) => {
+                    if(currentElement.id == id){
+                        this.todos.splice(index_inside, 1)
+                    }
+                })
             },
             getId: function () {
                 return this.cId + 1;

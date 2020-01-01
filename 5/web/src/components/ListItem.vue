@@ -6,7 +6,7 @@
         </template>
         <template v-else>
             <input placeholder="Type todo here..." v-model="input"/>
-            <button v-on:click="save(todo.id, input)">Save</button>
+            <button v-on:click="save(todo.id - 1, input)">Save</button>
             <button v-on:click="editing=true">Cancel</button>
         </template>
         <button v-on:click="remove(todo.id)">Remove</button>
