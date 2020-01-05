@@ -3,12 +3,8 @@
   "version": "1.0.0",
   "description": "backend",
   "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
-    "test": "npm test",
-    "start": "node server.js"
+    "test": "test"
   },
   "repository": {
     "type": "git",
@@ -29,6 +25,7 @@
     "apollo-server": "^2.9.15",
     "graphql-middleware": "^4.0.2",
     "graphql-shield": "^7.0.7",
+    "jest": "^24.9.0",
     "jsonwebtoken": "^8.5.1",
     "neo4j-graphql-js": "^2.11.1",
     "uuid": "^3.3.3"

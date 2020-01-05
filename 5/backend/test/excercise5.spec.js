@@ -55,7 +55,7 @@ describe('Creation of assignees and todo items', () => {
     })
 })
 
-const querygetTodoByAssigneeID = gql`query getAssigneeByTodo($assignee: String!) { getAssigneeByTodo(assignee: $assignee) { id, name }}`;
+const querygetTodoByAssigneeID = gql`query getAssigneeByTodo($id: String!) { getAssigneeByTodo(id: $id) { name, role }}`;
 //const queryTodosAssigneeShield = gql`query getAssigneeByAssigneeIDwithShield($assignee: String!) { getAssigneeByAssigneeIDwithShield(assignee: $assignee) { id, name, role}}`;
 
 describe('Query assignees and todo items', () => {
@@ -83,6 +83,7 @@ describe('Query assignees and todo items', () => {
 
     it('Test return Assignee Object with parameter `String assignee` ', async () => {
         await query({query: querygetTodoByAssigneeID, variables: {assignee: "1"}}).then((result) => {
+            console.log(result.data)
             expect(result.data).toBeTruthy();
         });
     })

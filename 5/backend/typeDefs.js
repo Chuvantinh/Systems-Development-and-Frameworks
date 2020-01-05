@@ -32,7 +32,7 @@ const typeDefs = `
   }
   
   type Query {
-    getAssigneeByTodo(assignee: String!): Assignee
+    getAssigneeByTodo(id: String!): Assignee
     getTodobyID(id: String!): Todos
     hello: Hello
   }

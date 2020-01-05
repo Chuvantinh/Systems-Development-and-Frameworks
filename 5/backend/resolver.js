@@ -12,9 +12,9 @@ const resolvers = {
             const session = context.driver.session();
 
             try{
-                const cypherQuery = 'MATCH (t:Todos { assignee: $assignee })-->(a:Assignee) ' +
+                const cypherQuery = 'MATCH (t:Todos { id: $id })-->(a:Assignee)' +
                     'RETURN a';
-                const result = await session.run(cypherQuery, { assignee: args.assignee });
+                const result = await session.run(cypherQuery, { id: args.id });
                 const data = result.records.map(record => record.get('a').properties)[0];
                 return data;
             } finally {

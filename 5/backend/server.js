@@ -15,7 +15,7 @@ const schema = applyMiddleware(
         typeDefs,
         resolvers,
     }),
-    //permissions,
+    permissions,
 )
 
 const driver = neo4j.driver(
