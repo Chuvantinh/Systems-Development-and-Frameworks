@@ -4,7 +4,7 @@
   "description": "backend",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   "homepage": "https://github.com/Chuvantinh/Systems-Development-and-Frameworks#readme",
   "dependencies": {
     "apollo-server": "^2.9.15",
+    "apollo-server-testing": "^2.9.15",
     "graphql-middleware": "^4.0.2",
     "graphql-shield": "^7.0.7",
     "jest": "^24.9.0",

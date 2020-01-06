@@ -3,53 +3,59 @@ const uuid = require('uuid/v1');
 
 const resolvers = {
     Query: {
-        hello : (object, args, context) => {
-            return {
-                message: "Hello word"
-            };
-        },
-        getAssigneeByTodo : async (object, args, context) => {
+        getProductByCategory : async (object, args, context) => {
             const session = context.driver.session();
-
             try{
-                const cypherQuery = 'MATCH (t:Todos { id: $id })-->(a:Assignee)' +
-                    'RETURN a';
+                const cypherQuery = 'MATCH (p:Product { title: $title })<-[:ASSIGNED_TO]-(c:Category)' +
+                    'RETURN c.name';
                 const result = await session.run(cypherQuery, { id: args.id });
-                const data = result.records.map(record => record.get('a').properties)[0];
+                const data = result.records.map(record => record.get('c').properties)[0];
                 return data;
             } finally {
                 session.close();
             }
         },
-        getTodobyID: async (object, args, context) => {
+        getProduct: async (object, args, context) => {
             const session = context.driver.session();
 
             try{
-                const cypherQuery = 'MATCH (t:Todos)' +
-                    'where t.id = $id ' +
-                    'RETURN t';
+                const cypherQuery = '' +
+                    'MATCH (p:Product)' +
+                    'where p.id = $id ' +
+                    'RETURN p';
                 const result = await session.run(cypherQuery, { id: args.id });
-                const todo = result.records.map(record => record.get('t').properties)[0];
-                return todo;
+                const data = result.records.map(record => record.get('p').properties)[0];
+                return data;
+            } finally {
+                session.close();
+            }
+        },
+        getCategory: async (object, args, context) => {
+            const session = context.driver.session();
+            try{
+                const cypherQuery = '' +
+                    'MATCH (c:Category)' +
+                    'where c.id = $id ' +
+                    'RETURN c';
+                const result = await session.run(cypherQuery, { id: args.id });
+                const data = result.records.map(record => record.get('c').properties)[0];
+                return data;
             } finally {
                 session.close();
             }
         },
     },
     Mutation: {
-        createTodo: async (object, args, context, resolveInfo) => {
-            const todoId = args.id || uuid();
-            const todoState = args.state || 'UNDONE';
-
+        createUser: async (object, args, context, resolveInfo) => {
+            const id = args.id || uuid();
             const session = context.driver.session();
             try {
-                const cypherCreation = 'CREATE (t:Todos { id: $todoId, message: $message, state: $state, assignee: $assignee })';
+                const cypherCreation = 'CREATE (u:User { id: $id, role: $role, token: $token })';
 
                 await session.run(cypherCreation, {
-                    todoId: todoId,
-                    message: args.message,
-                    state: todoState,
-                    assignee: args.assignee
+                    id: id,
+                    role: args.role,
+                    token: args.token,
                 });
                 return true;
             }
@@ -57,18 +63,34 @@ const resolvers = {
                 session.close();
             }
         },
-        createAssignee: async (object, args, context, resolveInfo) => {
-            const assigneeId = args.id || uuid();
+        createProduct: async (object, args, context, resolveInfo) => {
+            const id = args.id || uuid();
 
             const session = context.driver.session();
             try {
-                const cypherCreation = 'CREATE (a:Assignee { id: $assigneeId, name: $name, role: $role, token: $token })';
+                const cypherCreation = 'CREATE (p:Product { id: $id, title: $title, state: $state, category: $category })';
 
                 await session.run(cypherCreation, {
-                    assigneeId: assigneeId,
-                    name: args.name,
-                    role: args.role,
-                    token: args.token,
+                    id: id,
+                    title: args.title,
+                    state: args.state,
+                    category: args.category
+                });
+                return true;
+            }
+            finally {
+                session.close();
+            }
+        },
+        createCategory: async (object, args, context, resolveInfo) => {
+            const catID = args.id || uuid();
+            const session = context.driver.session();
+            try {
+                const cypherCreation = 'CREATE (c:Category { id: $id, title: $title})';
+
+                await session.run(cypherCreation, {
+                    id: catID,
+                    title: args.title,
                 });
                 return true;
             }
@@ -80,9 +102,9 @@ const resolvers = {
             const session = context.driver.session();
 
             try {
-                const cypherRelation = 'MATCH (a:Assignee), (t:Todos) ' +
-                    'WHERE a.name = $name AND t.id = $id ' +
-                    'CREATE (t)-[r:ASSIGNED_TO]->(a) RETURN type(r)';
+                const cypherRelation = 'MATCH (a:Product), (c:Category) ' +
+                    'WHERE a.id = $id AND c.id = $id ' +
+                    'CREATE (a)-[r:ASSIGNED_TO]->(c) RETURN type(r)';
 
                 await session.run(cypherRelation, {
                     name: args.name,
@@ -93,31 +115,12 @@ const resolvers = {
                 session.close();
             }
         },
-        deleteTodo: async (object, args, context, resolveInfo) => {
+        deleteALL: async (object, args, context, resolveInfo) => {
             const session = context.driver.session();
             try {
-                const cypherDelete = 'MATCH (t:Todos) WHERE t.id = $id DELETE t';
+                const cypherDelete = 'MATCH (n) DETACH DELETE n';
                 await session.run(cypherDelete, { id: args.id });
                 return true;
-            } finally {
-                session.close();
-            }
-        },
-        deleteAllTodos: async (object, args, context, resolveInfo) => {
-            const session = context.driver.session();
-            try {
-                const cypherDelete = 'MATCH (t:Todos) DETACH DELETE t';
-                await session.run(cypherDelete);
-                return true;
-            } finally {
-                session.close();
-            }
-        },
-        deleteAllAssignees: async (object, args, context, resolveInfo) => {
-            const session = context.driver.session();
-            try {
-                const cypherDelete = 'MATCH (a:Assignee) DETACH DELETE a';
-                await session.run(cypherDelete);
             } finally {
                 session.close();
             }

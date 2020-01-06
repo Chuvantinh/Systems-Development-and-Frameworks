@@ -1,49 +1,42 @@
 const typeDefs = `
   enum State {
-    DONE
-    UNDONE
-    IN_PROGRESS
+    ACTIVE
+    DEACTIVE
   }
   enum Order {
     DESC
     ASC
   }
-  type Todos {
+  type User{
     id: ID!
-    message: String!
-    state: State
-    assignee: String
-  }
-  
-  type Assignee {
-    id: ID!
-    name: String!
     role: String!
     token: String
   }
   
-  type Role{
-      type: String
-      role: String
+  type Product {
+    id: ID!
+    tite: String!
+    state: State
+    category: Int
   }
   
-  type Hello{
-        message: String
+  type Category {
+    id: ID!
+    title: String!
   }
   
   type Query {
-    getAssigneeByTodo(id: String!): Assignee
-    getTodobyID(id: String!): Todos
-    hello: Hello
+    getProductByCategory(id: Int!): Product
+    getProduct(id: String!): Product
+    getCategory(id: String!): Category
   }
   
   type Mutation {
-    createAssignee(id: ID, name: String!, role: String, token: String): Assignee
-    createTodo(id: ID, message: String!, state: State, assignee: String): Todos
-    createRelationship(id: ID!, name: String!): Todos
-    deleteTodo(id: ID!): Todos
-    deleteAllTodos: Boolean
-    deleteAllAssignees: Boolean
+    createUser(id: ID, role: String!, token: String): User
+    createProduct(id: ID, title: String!, state: String, category: Int): Product
+    createCategory(id: ID, title: String!): Category
+    createRelationship(id: ID!): Product
+    deleteALL: Product
   }
 `;
 
