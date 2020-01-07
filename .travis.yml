@@ -8,10 +8,14 @@ node_js:
 install:
   - cd 2
   - npm install
+  - cd ../3
+  - npm install
   - cd ..
 
 script:
   - cd 2
+  - npm test
+  - cd ../3
   - npm test
 
 notifications:
