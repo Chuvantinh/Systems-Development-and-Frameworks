@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Chuvantinh/Systems-Development-and-Frameworks#readme",
   "dependencies": {
+    "apollo-link-context": "^1.0.19",
     "apollo-server": "^2.9.15",
     "apollo-server-testing": "^2.9.15",
     "graphql-middleware": "^4.0.2",

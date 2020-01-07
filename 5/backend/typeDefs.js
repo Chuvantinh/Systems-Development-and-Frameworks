@@ -9,14 +9,16 @@ const typeDefs = `
   }
   type User{
     id: ID!
+    username: String,
+    password : String,
     role: String!
     token: String
   }
   
   type Product {
     id: ID!
-    tite: String!
-    state: State
+    title: String!
+    state: String
     category: Int
   }
   
@@ -26,17 +28,18 @@ const typeDefs = `
   }
   
   type Query {
-    getProductByCategory(id: Int!): Product
+    getCategoryByCategoryInProduct(category: Int!): Category
     getProduct(id: String!): Product
     getCategory(id: String!): Category
   }
   
   type Mutation {
-    createUser(id: ID, role: String!, token: String): User
+    createUser(id: ID, username: String, password : String,role: String!): User
     createProduct(id: ID, title: String!, state: String, category: Int): Product
     createCategory(id: ID, title: String!): Category
     createRelationship(id: ID!): Product
-    deleteALL: Product
+    deleteAll: Boolean
+    login(username: String, password: String): String
   }
 `;
 

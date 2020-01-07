@@ -1,16 +1,23 @@
 const { gql } = require('apollo-server')
-const server = require('../server.js')
+const neo4j = require('neo4j-driver');
 const {createTestClient} = require('apollo-server-testing');
+
 //const jwt = require('jsonwebtoken');
+//const { setContext } = require('apollo-link-context');
+//const server = require('../server.js')
 
-const { query, mutate } = createTestClient(server);
 
-const mutateCreateUser = gql`mutation createUser($id: ID, $role: String!, $token: String) {
-    createUser(id: $id, role: $role, token: $token) { id, role, token } 
+let driver;
+let query;
+let mutate;
+let token;
+
+const mutateCreateUser = gql`mutation createUser($id: ID, $username: String, $password: String, $role: String!) {
+    createUser(id: $id, username : $username, password: $password, role: $role) { id, role } 
 }`;
 
-const mutateCreateProduct = gql`mutation createProduct($id: ID, $title: String!, $state: State, $category: Int) {
-    createProduct(id: $id, title: $title, state: $state, category: $category) { id, title, state, category } 
+const mutateCreateProduct = gql`mutation createProduct($id: ID, $title: String!, $state: String, $category: Int) {
+    createProduct(id: $id, title: $title, state: $state, category: $category) { id, title } 
 }`;
 
 const mutateCreateCategory = gql`mutation createCategory($id: ID, $title: String!) {
@@ -21,24 +28,31 @@ const mutateCreateRelationship = gql`mutation createRelationship($id: ID!) {
     createRelationship(id: $id) { id } 
 }`;
 
+const mutateLogin = gql`mutation login($username: String, $password: String){
+    login(username: $username, password : $password){ id,username, password, role }
+}`
+
 const mutateDeleteAll = gql`mutation deleteAll { deleteAll }`;
 
-describe('Creation of product , category and user', () => {
-    const string_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidmFudGluaCJ9.kGNtLU173eM6kA7IVcGLJvLSXVlEeUXl8mnSBPZ3KF0"
-    const user = { id: 100, role: 'admin', token: string_token};
+describe('MUTATION Creation of product , category and user', () => {
+    const user = { id: 1, username: 'admin',password: '1234',role: 'admin'};
     const product = { id: 1, title: 'Tshirt', state: 'ACTIVE', category: 1};
     const category = { id: 1, title: 'Clothes'};
 
     beforeAll(async () => {
         await mutate({mutation: mutateDeleteAll});
+
+        CreateTestServer()
     })
 
     afterAll(async () => {
         await mutate({mutation: mutateDeleteAll});
+
+        CreateTestServer()
     })
 
     it('Add user to db', async () => {
-        await mutate({mutation: mutateCreateUser, variables: { id: user.id, role: user.role ,token: user.token}}).then((result) => {
+        await mutate({mutation: mutateCreateUser, variables: { id: user.id, username : user.username, password : user.password, role: user.role}}).then((result) => {
             expect(result.data).toBeTruthy();
         });
     })
@@ -60,24 +74,76 @@ describe('Creation of product , category and user', () => {
             expect(result.data).toBeTruthy();
         });
     })
-})
 
-describe('Query product and category', () => {
-    beforeEach(async () => {
-        await mutate({mutation: mutateDeleteAll});
-        const string_token1 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidmFudGluaCJ9.kGNtLU173eM6kA7IVcGLJvLSXVlEeUXl8mnSBPZ3KF0"
-        const string_token2 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidmFudGluaCJ9.kGNtLU173eM6kA7IVcGLJvLSXVlEeUXl8mnSBPZ3KF2"
-
-        await mutate({mutation: mutateCreateUser, variables: {id: 1, role: 'Admin', token: string_token1}});
-        await mutate({mutation: mutateCreateUser, variables: {id: 2, role: 'Editor', token: string_token2}});
-
-        await mutate({mutation: mutateCreateProduct, variables: {id: 1, title: 'Shirt', state: 'ACTIVE', category:1}});
-        await mutate({mutation: mutateCreateProduct, variables: {id: 2, message: 'Rock', state: 'ACTIVE',category: 2}});
-
-        await mutate({mutation: mutateCreateCategory, variables: {id: 1, title: 'Chirsmart'}});
-        await mutate({mutation: mutateCreateCategory, variables: {id: 2, message: 'New Year'}});
-
-        await mutate({mutation: mutateCreateRelationship, variables: { id: 1 }});
-        await mutate({mutation: mutateCreateRelationship, variables: { id: 2 }});
+    it('Check login', async () => {
+        await mutate({mutation: mutateLogin, variables: { username: user.username, password: user.password}}).then((result) => {
+            expect(result.data.login).toBeTruthy();
+        });
     })
 })
+
+describe('QUERY product and category', () => {
+    beforeEach(async () => {
+        await mutate({mutation: mutateDeleteAll});
+
+        CreateTestServer()
+    })
+
+    it('getCategoryByCategoryInProduct by ID in Product', async () => {
+        const querygetCategoryByCategoryInProduct = gql`query getCategoryByCategoryInProduct ($category: Int!)
+        {getCategoryByCategoryInProduct (category : $category){ id, title }}`;
+        await query({query: querygetCategoryByCategoryInProduct, variables: {category: 1}}).then((result) => {
+            expect(result.data.getCategoryByCategoryInProduct.title).toBe('Chirsmart');
+        });
+    })
+
+    it('getProduct by ID with true token', async () => {
+
+        const querygetProduct = gql`query getProduct ($id: String!)
+        {getProduct (id : $id){ id, title }}`;
+        await query({query: querygetProduct, variables: {id: "1"}}).then((result) => {
+            console.log(result.data);
+            expect(result.data.getProduct.title).toBe('Shirt');
+        });
+    })
+
+    it('getCategory by ID with true token', async () => {
+        const token = "adfaf";
+    })
+
+})
+
+const CreateTestServer =  async () => {
+    await mutate({mutation: mutateLogin, variables: { username: "admin", password: "1234" }}).then((result) => {
+        token = result.data.login
+    });
+    driver = neo4j.driver(
+        "bolt://localhost:7687",
+        neo4j.auth.basic('neo4j', '1234')
+    );
+
+    const { testServer } = constructTestServer();
+    testServer.requestOptions = {
+        context: async ({  }) => {
+            let user = null
+
+            if(typeof req.headers.authorization == "undefined" || typeof req == "undefined"){
+                user = null
+            }else{
+                user = await decode(driver, token);
+            }
+            return {
+                driver,
+                user
+            }
+        },
+    };
+    query = createTestClient(testServer).query;
+    mutate = createTestClient(testServer).mutate;
+    return {
+        query,
+        mutate,
+        token,
+        driver
+    }
+}

@@ -6,58 +6,68 @@ const { applyMiddleware } = require('graphql-middleware')
 const neo4j = require('neo4j-driver');
 const { makeAugmentedSchema } = require('neo4j-graphql-js')
 
-//const permissions = require('./shield')
 
-//const decode = require('./decode')
+const permissions = require('./shield')
 
-// const schema = applyMiddleware(
-//     makeAugmentedSchema({
-//         typeDefs,
-//         resolvers
-//     }),
-//     //permissions,
-// )
-
-const schema = makeAugmentedSchema({
-    typeDefs: typeDefs,
-    resolvers: resolvers
-});
+const schema = applyMiddleware(
+    makeAugmentedSchema({
+        typeDefs,
+        resolvers
+    }),
+    permissions,
+)
 
 const driver = neo4j.driver(
     'bolt://localhost:7687',
     neo4j.auth.basic('neo4j', '1234')
 );
-
-
-// const decode = async (driver, req) => {
-//     //console.log(req.get.authorization);
-//
-//     try {
-//         //name is {name;vantinh}, security is angichua
-//         let decoded = await jwt.verify(req.headers.authorization, 'angichua')
-//         if(decoded.name = "vantinh"){
-//             const session = driver.session()
-//             const cypherQuery = 'MATCH (a:Assignee) ' +
-//                 'where a.token = $token ' +
-//                 'RETURN a';
-//             const result = await session.run(cypherQuery, { token: token});
-//             const data = result.records.map(record => record.get('a').properties)[0];
-//
-//             return {
-//                 data
-//             }
-//         }
-//     } catch (err) {
-//         return null
-//     }
+// payload: {
+//     "username": "admin",
+//      "password": "1234"
 // }
+const decode = async (driver, token) => {
+    const JWT = require('jsonwebtoken');
+    const SECRET = "Friday for future";
+
+    var object_decode = await  JWT.verify(token, SECRET)
+    if(object_decode){
+        const username = object_decode.username
+        const password = object_decode.password
+        const session = driver.session()
+        const cypherQuery = 'MATCH (u:User) ' +
+            'where u.username = $username  and u.password = $password ' +
+            'RETURN u';
+        const result = await session.run(cypherQuery, {username: username, password: password});
+        const data = result.records.map(record => record.get('u').properties)[0];
+        session.close()
+        if(data){
+            return {data}
+        }else{
+            return null
+        }
+    }else{
+        return null
+    }
+
+
+}
 
 module.exports = new ApolloServer({
     schema: schema,
     context: async ({ req }) => {
-        //const user = await decode(driver, req);
+        let user = null
+
+        if(typeof req.headers.authorization == "undefined" || typeof req == "undefined"){
+            user = null
+        }else{
+            user = await decode(driver, req.headers.authorization);
+        }
         return {
-            driver, req
+            driver,
+            req,
+            user
         }
     },
 })
+
+//token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiIxMjM0In0.qXkwDG2BDK5nQVVjJVtDmcu0y4sRVrDnPlf0Klxm5tM

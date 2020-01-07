@@ -1,14 +1,14 @@
-const jwt = require('jsonwebtoken');
 const uuid = require('uuid/v1');
-
+const jwt = require('jsonwebtoken');
+const SECRET = "Friday for future";
 const resolvers = {
     Query: {
-        getProductByCategory : async (object, args, context) => {
+        getCategoryByCategoryInProduct : async (object, args, context) => {
             const session = context.driver.session();
             try{
-                const cypherQuery = 'MATCH (p:Product { title: $title })<-[:ASSIGNED_TO]-(c:Category)' +
-                    'RETURN c.name';
-                const result = await session.run(cypherQuery, { id: args.id });
+                const cypherQuery = 'MATCH (p:Product { category: $category })-[:ASSIGNED_TO]->(c:Category)' +
+                    'RETURN c';
+                const result = await session.run(cypherQuery, { category: args.category });
                 const data = result.records.map(record => record.get('c').properties)[0];
                 return data;
             } finally {
@@ -17,7 +17,6 @@ const resolvers = {
         },
         getProduct: async (object, args, context) => {
             const session = context.driver.session();
-
             try{
                 const cypherQuery = '' +
                     'MATCH (p:Product)' +
@@ -43,19 +42,20 @@ const resolvers = {
             } finally {
                 session.close();
             }
-        },
+        }
     },
     Mutation: {
         createUser: async (object, args, context, resolveInfo) => {
             const id = args.id || uuid();
             const session = context.driver.session();
             try {
-                const cypherCreation = 'CREATE (u:User { id: $id, role: $role, token: $token })';
+                const cypherCreation = 'CREATE (u:User { id: $id, username : $username , password : $password ,role: $role })';
 
                 await session.run(cypherCreation, {
                     id: id,
+                    username: args.username,
+                    password: args.password,
                     role: args.role,
-                    token: args.token,
                 });
                 return true;
             }
@@ -115,7 +115,7 @@ const resolvers = {
                 session.close();
             }
         },
-        deleteALL: async (object, args, context, resolveInfo) => {
+        deleteAll: async (object, args, context, resolveInfo) => {
             const session = context.driver.session();
             try {
                 const cypherDelete = 'MATCH (n) DETACH DELETE n';
@@ -124,7 +124,29 @@ const resolvers = {
             } finally {
                 session.close();
             }
-        }
+        },
+        login: async (object, args, context, resolveInfo) => {
+            const session = context.driver.session();
+            try {
+                const cypherQuery = '' +
+                    'MATCH (u:User) ' +
+                    'where u.username = $username and u.password = $password ' +
+                    'RETURN u';
+                const result = await session.run(cypherQuery, { username: args.username, password: args.password });
+                const data = result.records.map(record => record.get('u').properties)[0];
+                if(data) {
+                    let tokenMessage = jwt.sign({username: args.username, password: args.password}, SECRET);
+                    return tokenMessage
+                }else{
+                    if (!data) {
+                        throw new Error('No user with that email')
+                    }
+                }
+
+            } finally {
+                session.close();
+            }
+        },
     },
 };
 
