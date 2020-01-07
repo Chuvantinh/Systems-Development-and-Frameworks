@@ -3,7 +3,8 @@
 /2/node_modules/*
 /3/node_modules/*
 /4/node_modules/*
-
+/5/backend/node_modules/*
+/5/web/node_modules/*
 
 /3/backend/node_modules/*
 /3/*
