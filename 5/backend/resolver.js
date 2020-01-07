@@ -1,6 +1,7 @@
 const uuid = require('uuid/v1');
 const jwt = require('jsonwebtoken');
 const SECRET = "Friday for future";
+const { AuthenticationError } = require('apollo-server');
 const resolvers = {
     Query: {
         getCategoryByCategoryInProduct : async (object, args, context) => {
@@ -16,18 +17,18 @@ const resolvers = {
             }
         },
         getProduct: async (object, args, context) => {
-            const session = context.driver.session();
-            try{
-                const cypherQuery = '' +
-                    'MATCH (p:Product)' +
-                    'where p.id = $id ' +
-                    'RETURN p';
-                const result = await session.run(cypherQuery, { id: args.id });
-                const data = result.records.map(record => record.get('p').properties)[0];
-                return data;
-            } finally {
-                session.close();
-            }
+                const session = context.driver.session();
+                try{
+                    const cypherQuery = '' +
+                        'MATCH (p:Product)' +
+                        'where p.id = $id ' +
+                        'RETURN p';
+                    const result = await session.run(cypherQuery, { id: args.id });
+                    const data = result.records.map(record => record.get('p').properties)[0];
+                    return data;
+                } finally {
+                    session.close();
+                }
         },
         getCategory: async (object, args, context) => {
             const session = context.driver.session();
@@ -42,7 +43,31 @@ const resolvers = {
             } finally {
                 session.close();
             }
-        }
+        },
+        getUser: async (object, args, context, resolveInfo) => {
+            const session = context.driver.session();
+            try {
+                const cypherQuery = '' +
+                    'MATCH (u:User) ' +
+                    'where u.username = $username and u.password = $password ' +
+                    'RETURN u';
+                const result = await session.run(cypherQuery, { username: args.username, password: args.password });
+                const data = result.records.map(record => record.get('u').properties)[0];
+                if(data) {
+                    let tokenMessage = jwt.sign({username: args.username, password: args.password}, SECRET);
+                    return {
+                        tokenMessage,
+                        data
+                    }
+                }else{
+                    if (!data) {
+                        throw new Error('No user with that email')
+                    }
+                }
+            } finally {
+                session.close();
+            }
+        },
     },
     Mutation: {
         createUser: async (object, args, context, resolveInfo) => {
@@ -142,7 +167,6 @@ const resolvers = {
                         throw new Error('No user with that email')
                     }
                 }
-
             } finally {
                 session.close();
             }

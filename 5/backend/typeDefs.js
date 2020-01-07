@@ -31,6 +31,7 @@ const typeDefs = `
     getCategoryByCategoryInProduct(category: Int!): Category
     getProduct(id: String!): Product
     getCategory(id: String!): Category
+    getUser(username: String, password: String): User
   }
   
   type Mutation {

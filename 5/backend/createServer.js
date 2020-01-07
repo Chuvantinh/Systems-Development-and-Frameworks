@@ -3,8 +3,15 @@ const typeDefs = require('./typeDefs')
 const resolvers = require('./resolver')
 
 const { applyMiddleware } = require('graphql-middleware')
-const neo4j = require('neo4j-driver');
 const { makeAugmentedSchema } = require('neo4j-graphql-js')
+
+const neo4j = require('neo4j-driver');
+
+const driver = neo4j.driver(
+    'bolt://localhost:7687',
+    neo4j.auth.basic('neo4j', '1234')
+);
+
 const permissions = require('./shield')
 
 const schema = applyMiddleware(
@@ -15,10 +22,6 @@ const schema = applyMiddleware(
     permissions,
 )
 
-const driver = neo4j.driver(
-    'bolt://localhost:7687',
-    neo4j.auth.basic('neo4j', '1234')
-);
 const decode = async (driver, token) => {
 
     const JWT = require('jsonwebtoken');
@@ -45,30 +48,21 @@ const decode = async (driver, token) => {
     }
 }
 
-module.exports = new ApolloServer({
-    schema: schema,
-    context: async ({ req }) => {
-        let user;
-        if(typeof  req !== "undefined"){
-            if( typeof req.headers.authorization == "undefined" ){
-                user = null
-            }else{
-                user = await decode(driver, req.headers.authorization);
-            }
-        }else{
-            user = null
-        }
+const context = async ({ req }) => {
+    const user = await decode(driver, req.headers.authorization)
+    return {
+        driver,
+        user,
+        req,
+    }
+}
 
-        return {
-            driver,
-            req,
-            user: user
-        }
-    },
-})
+module.exports = options => {
+    const defaults = {
+        context,
+        schema: schema,
+    }
+    const server = new ApolloServer(Object.assign({}, defaults, options))
 
-//token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiIxMjM0In0.qXkwDG2BDK5nQVVjJVtDmcu0y4sRVrDnPlf0Klxm5tM
-// payload: {
-//     "username": "admin",
-//      "password": "1234"
-// }
+    return { server }
+}
