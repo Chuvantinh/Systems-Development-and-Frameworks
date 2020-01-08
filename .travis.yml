@@ -12,12 +12,29 @@ install:
   - npm install
   - cd ..
 
+  - cd 5/backend
+  - npm install
+  - cd ..
+  - cd 5/web
+  - npm install
+
 script:
   - cd 2
   - npm test
   - cd ../3
   - npm test
+  - cd ..
+
+  - cd 5/backend
+  - npm test
+  - cd ..
+  - cd 5/web
+  - npm run dev
+  - cd ..
+  - cd ..
 
 notifications:
   email:
   - chuvantinh1991@gmail.com
+
+
