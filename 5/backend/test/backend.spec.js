@@ -63,12 +63,6 @@ describe('MUTATION Creation of product , category and user', () => {
             expect(result.data).toBeTruthy();
         });
     });
-
-    it('Check login', async () => {
-         await mutate({mutation: mutateLogin, variables: { username: user.username, password: user.password}}).then((result) => {
-             //expect(result.data).toBeTruthy();
-         });
-    });
 });
 describe('QUERY product and category', () => {
     beforeEach(async () => {
