@@ -27,7 +27,7 @@ describe('QUERY', () => {
         {getCategory (id : $id){ id, title }}`;
 
         await expect(query({query: querygetCategory, variables: {id: "1"}})).resolves.toMatchObject({
-            errors: [{ message: 'ERORR' }]
+            errors: [{ message: 'ERORR NOT ADMIN' }]
         })
     })
 });
