@@ -27,8 +27,16 @@ describe('QUERY', () => {
         const querygetProduct = gql`query getProduct ($id: String!)
         {getProduct (id : $id){ id, title }}`;
 
-        await query({query: querygetProduct, variables: {id: "2"}}).then((result) => {
-            expect(result.data.getProduct.title).toBe('Rock');
-        });
+        await expect(query({query: querygetProduct, variables: {id: "1"}})).resolves.toMatchObject({
+
+            data:
+                {
+                "getProduct": {
+                        "id": "1",
+                        "title": "Shirt",
+                    }
+                },
+            errors: undefined
+        })
     })
 });

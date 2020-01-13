@@ -64,6 +64,9 @@ describe('MUTATION Creation of product , category and user', () => {
         });
     });
 });
+
+
+
 describe('QUERY product and category', () => {
     beforeEach(async () => {
 
@@ -85,8 +88,14 @@ describe('QUERY product and category', () => {
     it('getCategoryByCategoryInProduct by ID in Product', async () => {
         const querygetCategoryByCategoryInProduct = gql`query getCategoryByCategoryInProduct ($category: Int!)
         {getCategoryByCategoryInProduct (category : $category){ id, title }}`;
-        await query({query: querygetCategoryByCategoryInProduct, variables: {category: 1}}).then((result) => {
-            expect(result.data.getCategoryByCategoryInProduct.title).toBe('Chirsmart');
-        });
+
+        await expect(query({query: querygetCategoryByCategoryInProduct, variables: {category: 1}})).resolves.toMatchObject({
+            data: {
+                "getCategoryByCategoryInProduct": {
+                    "title": "Chirsmart",
+                    "id": "1"
+                }
+            }
+        })
     });
 });
