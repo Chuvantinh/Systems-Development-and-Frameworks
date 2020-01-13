@@ -1,0 +1,38 @@
+{
+  "name": "5-backend",
+  "version": "1.0.0",
+  "description": "backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "verbose": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chuvantinh/Systems-Development-and-Frameworks.git"
+  },
+  "keywords": [
+    "vuejs",
+    "nodejs",
+    "apollo"
+  ],
+  "author": "vantinh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Chuvantinh/Systems-Development-and-Frameworks/issues"
+  },
+  "homepage": "https://github.com/Chuvantinh/Systems-Development-and-Frameworks#readme",
+  "dependencies": {
+    "apollo-link-context": "^1.0.19",
+    "apollo-server": "^2.9.15",
+    "apollo-server-testing": "^2.9.15",
+    "graphql-middleware": "^4.0.2",
+    "graphql-shield": "^7.0.7",
+    "jest": "^24.9.0",
+    "jsonwebtoken": "^8.5.1",
+    "neo4j-graphql-js": "^2.11.1",
+    "uuid": "^3.3.3"
+  }
+}
